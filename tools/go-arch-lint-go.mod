@@ -1,4 +1,4 @@
-module github.com/WinPooh32/chips/misc
+module github.com/WinPooh32/chips/tools
 
 go 1.26.2
 
