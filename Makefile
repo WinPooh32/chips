@@ -11,7 +11,6 @@ include $(MAKE_DIR)/Makefile.fmt
 include $(MAKE_DIR)/Makefile.tools
 include $(MAKE_DIR)/Makefile.test
 include $(MAKE_DIR)/Makefile.run
-include $(MAKE_DIR)/Makefile.issue
 include $(MAKE_DIR)/Makefile.gen
 
 ## Show available targets

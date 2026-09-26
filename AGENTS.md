@@ -70,50 +70,56 @@ and clarifying questions come before implementation.
 
 ## 5. Tasks tracking
 
-This project uses bd (beads) for issue tracking.
+This project uses the chips CLI (`chips`) for issue tracking.
 - Do not create MEMORY.md files.
 - Do not use markdown TODO lists for task tracking.
 
 ## Core Rules
-- **Default**: Use beads for ALL task tracking (`make issue/create`, `make issue/ready`, `make issue/close`)
+- **Default**: Use chips for ALL task tracking (`chips create`, `chips ready`, `chips close`)
 - **Prohibited**: Do NOT use TodoWrite, TaskCreate, or markdown files for task tracking
-- **Workflow**: Create beads issue BEFORE writing code, claim it when starting
+- **Workflow**: Create a chips issue BEFORE writing code, claim it when starting
 - Persistence you don't need beats lost context
 - Git authority: no git operations in this context
 - Git workflow: stealth mode (no git ops)
-- Session management: check `make issue/ready` for available work
+- Session management: check `chips ready` for available work
 
 ### Creating & Updating
 
 #### New issue
 ```bash
-make issue/create TITLE="<issue name>" DESCRIPTION="<issue description>" TYPE="<task|bug|feature>"
+chips create "<issue name>" --desc "<issue description>" --type "<task|bug|feature|epic>"
 ```
 
-Newlines in DESCRIPTION: use literal \n (the recipe converts it); keep the value on one line.
-
-#### Hierarchical child (task under epic, subtask under task; inherits parent labels)
+#### Hierarchical child (task under epic, subtask under task)
 ```bash
-make issue/create-child TITLE="<issue name>" DESCRIPTION="<issue description>" TYPE="<task|bug|feature>" PARENT="<id>"
+chips create "<issue name>" --desc "<issue description>" --type "<task|bug|feature|epic>" --parent "<id>"
 ```
 
 ### Common Workflows
 
 #### Starting work
 ```bash
-make issue/ready                 # Find available work
-make issue/show ISSUE_ID="<id>"   # Review issue details
-make issue/claim ISSUE_ID="<id>"  # Claim it
+chips ready                 # Find available work
+chips show <id>             # Review issue details
+chips claim <id>            # Claim it
 ```
 
 #### Completing work
 ```bash
-make issue/close ISSUES="<id_1> <id_2> ..." REASON="reason to close"    # Close all completed issues at once
+chips close <id_1> <id_2> ... --reason "reason to close"    # Close all completed issues at once
 ```
 
-#### Set blocked by another issue
+#### Dependencies (blocking is automatic)
 ```bash
-make issue/set-status ISSUE_ID="<id>" STATUS="blocked" REASON="<reason why its blocked by another issue>"
+chips dep add <id> <dep-id>    # Block <id> until <dep-id> is closed
+chips dep rm <id> <dep-id>     # Remove the dependency
+```
+
+`dep add` moves the issue to blocked/ automatically; closing the dependency unblocks it.
+
+#### Set status
+```bash
+chips status <id> <open|in_progress|done> --note "<reason>"
 ```
 
 ### Issue Templates
@@ -153,29 +159,6 @@ Big project description
 - Project ships
 - Users happy
 ```
-
-**decision** — requires `## Decision`, `## Rationale`, `## Alternatives Considered`
-```markdown
-## Decision
-What was decided
-
-## Rationale
-Why this option was chosen
-
-## Alternatives Considered
-List of alternatives and why they were rejected
-```
-
-**spike** — requires `## Goal`, `## Findings`
-```markdown
-## Goal
-What question does this spike answer?
-
-## Findings
-What was learned?
-```
-
-**chore** / **message** / **molecule** — no required sections
 
 ## 6. Validation
 

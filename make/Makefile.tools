@@ -7,7 +7,7 @@ install/tools:
 	done
 	@echo "Installing typos..."
 	@bash tools/scripts/install-typos.sh
-	@echo "Installing beads..."
-	@bash tools/scripts/install-beads.sh
+	@echo "Installing chips..."
+	@go install github.com/WinPooh32/chips/cmd/chips@latest
 	@echo "Installing lightpanda..."
 	@bash tools/scripts/install-lightpanda.sh

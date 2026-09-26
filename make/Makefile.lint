@@ -1,6 +1,6 @@
 ## Run all linters
 .PHONY: lint
-lint: lint/go lint/typos lint/md lint/arch lint/bd lint/untested lint/scc
+lint: lint/go lint/typos lint/md lint/arch lint/untested lint/scc
 
 ## Run ci linters
 .PHONY: lint/ci
@@ -25,11 +25,6 @@ lint/md:
 lint/arch:
 	@echo "Run architecture linter"
 	@go tool -modfile=tools/go-arch-lint-go.mod go-arch-lint check
-
-.PHONY: lint/bd
-lint/bd:
-	@echo "Run beads linter"
-	@tools/bin/bd lint
 
 ## Check for packages without tests
 .PHONY: lint/untested
