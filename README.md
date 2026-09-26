@@ -1,5 +1,7 @@
 # chips
 
+![logo](static/logo.png "gopher is eating chips")
+
 chips is a local task tracker. It tracks tasks as plain markdown files in a
 `.chips/` directory inside your project — no server, no database, no git
 integration. One small Go binary.
