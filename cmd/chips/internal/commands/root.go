@@ -28,7 +28,7 @@ func storeDir() string {
 func NewRoot() *cobra.Command {
 	cmd := new(cobra.Command)
 	cmd.Use = "chips"
-	cmd.Short = "Local task tracker on plain markdown files"
+	cmd.Short = "chips is a local task tracker"
 	cmd.SilenceErrors = true
 	cmd.SilenceUsage = true
 	cmd.AddCommand(
