@@ -20,8 +20,7 @@ You MUST follow these instructions:
   - Format:
 
     ```md
-    - [research name](.agents/skills/research/researches/<name>.md) —
-      <brief description of no more than 20 words>
+    - [research name](.agents/skills/research/researches/<name>.md) — <date (year, month, day, e.g. 2026-09-26)> — <brief description of no more than 20 words>
     ```
 
   - Add new entries to the top of the list (above existing entries).
@@ -31,6 +30,8 @@ You MUST follow these instructions:
   - Briefly describe the original question.
   - Make updates to the research file during the study process, not just at
     the final summary.
+  - On the final change to the research file, update the date in its index
+    entry to the date (year, month, day) of that final change.
 
 NOTICE: When delegating to an agent, require the research to be updated
 incrementally, not all at once! Also, use code symbols instead of copying
