@@ -27,7 +27,7 @@ jobs:
             ~/.cache/go-build
             ~/.cache/golangci-lint
             ~/go/pkg/mod
-            misc/bin/
+            tools/bin/
           key: ${{ runner.os }}-go-${{ env.GO_VERSION }}-tools-${{ hashFiles('tools/*-go.mod', 'tools/*-go.sum', 'tools/scripts/install-typos.sh', 'tools/scripts/scc-threshold.sh') }}
           restore-keys: |
             ${{ runner.os }}-go-tools-
