@@ -6,4 +6,4 @@ typ = "typ"
 nd = "nd"
 
 [files]
-extend-exclude = ["*go.mod", "*go.sum"]
+extend-exclude = ["*go.mod", "*go.sum", "tools/**"]
