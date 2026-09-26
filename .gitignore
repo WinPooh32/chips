@@ -37,4 +37,5 @@ report.json
 # Misc
 .llm-wiki/
 .beads/
+.beads.gate.lock
 PLAN.md
