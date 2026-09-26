@@ -1,9 +1,3 @@
-## Run waddle example app
-.PHONY: run/waddle
-run/waddle:
-	@echo "Run waddle example app"
-	@go run ./cmd/waddle
-
 ## Run gopls mcp
 .PHONY: run/mcp-gopls
 run/mcp-gopls:
