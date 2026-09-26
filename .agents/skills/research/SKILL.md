@@ -24,6 +24,7 @@ You MUST follow these instructions:
     ```
 
   - Add new entries to the top of the list (above existing entries).
+  - Update index entries order using command: `bash .agents/skills/research/scripts/sort-index.sh`.
 
 3. Create a new research file in .agents/skills/research/researches/<name>.md
 
