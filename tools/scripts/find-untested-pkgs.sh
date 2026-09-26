@@ -6,10 +6,10 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-MODULE="github.com/WinPooh32/insight"
+MODULE="github.com/WinPooh32/chips"
 
 # Directories to exclude from the report.
-EXCLUDE_DIRS=("db" "migrations" "config" "cmd/insight")
+EXCLUDE_DIRS=("db" "migrations" "config" "cmd/chips")
 
 cd "$ROOT_DIR"
 

@@ -12,7 +12,7 @@ ERROR_LINES=1000
 
 cd "$ROOT_DIR"
 
-counts=$(go tool -modfile=misc/scc-go.mod scc --no-gen --include-ext go --no-size -M '_test\.go$' --by-file --format json "${1:-.}" \
+counts=$(go tool -modfile=tools/scc-go.mod scc --no-gen --include-ext go --no-size -M '_test\.go$' --by-file --format json "${1:-.}" \
     | jq -r '
         [ .[].Files[]
           | { dir: (.Location | rindex("/") as $i

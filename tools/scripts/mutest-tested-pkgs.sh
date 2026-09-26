@@ -7,7 +7,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-MODULE="github.com/WinPooh32/insight"
+MODULE="github.com/WinPooh32/chips"
 
 WORKTREE_BASE=$(mktemp -d)
 RESULT_DIR=$(mktemp -d)
@@ -21,9 +21,9 @@ trap cleanup EXIT
 
 cd "$ROOT_DIR"
 
-# Find directories with _test.go files under cmd/insight/internal,
+# Find directories with _test.go files under cmd/chips/internal,
 # deduplicate, and convert to full module paths.
-PACKAGES=$(find cmd/insight/internal -mindepth 2 -name '*_test.go' \
+PACKAGES=$(find cmd/chips/internal -mindepth 2 -name '*_test.go' \
     -exec dirname {} \; \
     | sort -u \
     | sed "s|^|${MODULE}/|")
