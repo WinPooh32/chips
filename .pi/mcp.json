@@ -1,0 +1,34 @@
+{
+  "settings": {
+    "directTools": true,
+    "freezeDirectTools": true,
+    "scriptMode": false,
+    "disableProxyTool": true,
+    "outputGuard": false,
+    "toolPrefix": "server",
+    "requestTimeoutMs": 30000
+  },
+  "mcpServers": {
+    "gopls": {
+      "command": "make",
+      "args": [
+        "run/mcp-gopls"
+      ]
+    },
+    "searxng": {
+      "command": "make",
+      "args": [
+        "run/mcp-searxng"
+      ]
+    },
+    "browser": {
+      "command": "make",
+      "args": [
+        "run/mcp-lightpanda"
+      ],
+      "directTools": [
+        "markdown"
+      ]
+    }
+  }
+}

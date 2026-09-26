@@ -1,0 +1,23 @@
+## Run waddle example app
+.PHONY: run/waddle
+run/waddle:
+	@echo "Run waddle example app"
+	@go run ./cmd/waddle
+
+## Run gopls mcp
+.PHONY: run/mcp-gopls
+run/mcp-gopls:
+	@echo "Run gopls MCP server"
+	@go tool -modfile=tools/gopls-go.mod gopls mcp
+
+## Run searxng mcp
+.PHONY: run/mcp-searxng
+run/mcp-searxng:
+	@echo "Run SearXNG MCP server"
+	@go tool -modfile=tools/searxng-mcp-go.mod searxng-mcp $(SEARXNG_ARGS)
+
+## Run lightpanda mcp
+.PHONY: run/mcp-lightpanda
+run/mcp-lightpanda:
+	@echo "Run lightpanda MCP server"
+	@tools/bin/lightpanda mcp $(LIGHTPANDA_ARGS)

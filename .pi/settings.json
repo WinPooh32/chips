@@ -1,0 +1,87 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/motd.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/reminder.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/circuit-breaker.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/block-download-pipes.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "write|edit|bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/block-nolint.sh",
+            "statusMessage": "Checking for //nolint..."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/circuit-breaker.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "searxng_query|browser_markdown",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/warn-mcp-query.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".pi/scripts/warn-web-request.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

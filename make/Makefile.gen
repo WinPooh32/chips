@@ -1,0 +1,21 @@
+## Generate all
+.PHONY: gen/all
+gen/all: gen/sqlc gen/go gen/templ
+
+## Generate sqlc code for all sqlc.yaml files
+.PHONY: gen/sqlc
+gen/sqlc:
+	@echo "Run sqlc"
+	@tools/scripts/sqlc-generate.sh
+
+## Generate Go targets
+.PHONY: gen/go
+gen/go:
+	@echo "Run go generate"
+	@go generate ./...
+
+## Generate templ Go code
+.PHONY: gen/templ
+gen/templ:
+	@echo "Run templ"
+	@go tool -modfile=tools/templ-go.mod templ generate ./...

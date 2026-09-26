@@ -1,0 +1,22 @@
+version: 3
+workdir: .
+allow:
+  depOnAnyVendor: true
+excludeFiles:
+  - "^.*_test\\.go$"
+
+components:
+  main: { in: cmd/*/ }
+  application: { in: cmd/*/internal/** }
+  config: { in: cmd/*/internal/config/** }
+  storage: { in: cmd/*/intenal/**/storage/** }
+  lib: { in: cmd/*/internal/**/lib/** }
+
+deps:
+  main:
+    mayDependOn:
+      - config
+      - application
+  storage:
+    mayDependOn:
+      - application

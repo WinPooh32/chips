@@ -1,0 +1,50 @@
+## Run all linters
+.PHONY: lint
+lint: lint/go lint/typos lint/md lint/arch lint/bd lint/untested lint/scc
+
+## Run ci linters
+.PHONY: lint/ci
+lint/ci: lint/go lint/typos lint/md lint/arch lint/untested lint/scc
+
+.PHONY: lint/go
+lint/go:
+	@echo "Run go linter"
+	@go tool -modfile=tools/golangci-lint-go.mod golangci-lint run ./... -c .golangci.yml
+
+.PHONY: lint/typos
+lint/typos:
+	@echo "Run typos linter"
+	@tools/bin/typos
+
+.PHONY: lint/md
+lint/md:
+	@echo "Run markdown linter"
+	@go tool -modfile=tools/mdsmith-go.mod mdsmith check
+
+.PHONY: lint/arch
+lint/arch:
+	@echo "Run architecture linter"
+	@go tool -modfile=tools/go-arch-lint-go.mod go-arch-lint check
+
+.PHONY: lint/bd
+lint/bd:
+	@echo "Run beads linter"
+	@tools/bin/bd lint
+
+## Check for packages without tests
+.PHONY: lint/untested
+lint/untested:
+	@echo "Check for packages without tests"
+	@tools/scripts/find-untested-pkgs.sh
+
+## Check Go code size thresholds
+.PHONY: lint/scc
+lint/scc:
+	@echo "Run scc threshold check"
+	@bash tools/scripts/scc-threshold.sh
+
+## Count code with scc
+.PHONY: stats/scc
+stats/scc:
+	@echo "Counting code with scc"
+	@bash tools/scripts/scc-threshold.sh $(if $(PACKAGE),$(PACKAGE),.)

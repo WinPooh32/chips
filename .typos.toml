@@ -1,0 +1,9 @@
+# Typo check: https://github.com/crate-ci/typos
+[default]
+
+[default.extend-words]
+typ = "typ"
+nd = "nd"
+
+[files]
+extend-exclude = ["*go.mod", "*go.sum"]

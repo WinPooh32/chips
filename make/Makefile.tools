@@ -1,0 +1,13 @@
+.PHONY: install/tools
+install/tools:
+	@echo "Downloading misc tool dependencies..."
+	@for mod in tools/*-go.mod; do \
+		echo "Processing $$mod..."; \
+		go mod download -modfile="$$mod"; \
+	done
+	@echo "Installing typos..."
+	@bash tools/scripts/install-typos.sh
+	@echo "Installing beads..."
+	@bash tools/scripts/install-beads.sh
+	@echo "Installing lightpanda..."
+	@bash tools/scripts/install-lightpanda.sh

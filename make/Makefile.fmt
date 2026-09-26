@@ -1,0 +1,18 @@
+## Format all source files
+.PHONY: fmt
+fmt: fmt/go fmt/golangci-lint fmt/md
+
+.PHONY: fmt/go
+fmt/go:
+	@echo "Format Go source files"
+	@go tool -modfile=tools/gofumpt-go.mod gofumpt -l -w .
+
+.PHONY: fmt/golangci-lint
+fmt/golangci-lint:
+	@echo "Auto-fix lint issues"
+	@go tool -modfile=tools/golangci-lint-go.mod golangci-lint run ./... -c .golangci.yml --fix --timeout=5m --issues-exit-code=0
+
+.PHONY: fmt/md
+fmt/md:
+	@echo "Format Markdown files"
+	@go tool -modfile=tools/mdsmith-go.mod mdsmith fix || true
