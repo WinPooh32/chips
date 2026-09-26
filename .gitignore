@@ -40,3 +40,4 @@ report.json
 .beads.gate.lock
 PLAN.md
 plans/
+.chips/
