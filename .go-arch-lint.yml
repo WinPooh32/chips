@@ -1,15 +1,23 @@
 version: 3
 workdir: .
 allow:
-  depOnAnyVendor: true
+  depOnAnyVendor: false
 excludeFiles:
   - "^.*_test\\.go$"
 
+vendors:
+  go-common:
+    in:
+      - golang.org/x/sync/errgroup
+      - github.com/stretchr/testify/**
+  3rd-cobra: { in: github.com/spf13/cobra }
+
+commonVendors:
+  - go-common
+
 components:
   main: { in: cmd/*/ }
-  application: { in: cmd/*/internal/** }
-  config: { in: cmd/*/internal/config/** }
-  storage: { in: cmd/*/intenal/**/storage/** }
+  commands: { in: cmd/*/internal/commands }
   lib: { in: cmd/*/internal/**/lib/** }
 
 deps:
@@ -17,6 +25,9 @@ deps:
     mayDependOn:
       - config
       - application
-  storage:
+      - commands
+  commands:
     mayDependOn:
-      - application
+      - lib
+    canUse:
+      - 3rd-cobra
