@@ -1,4 +1,4 @@
-module github.com/WinPooh32/insight/misc/cmd/mdsmith
+module github.com/WinPooh32/chips/tools/cmd/mdsmith
 
 go 1.26.2
 

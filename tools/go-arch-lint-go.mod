@@ -1,4 +1,4 @@
-module github.com/WinPooh32/insight/misc
+module github.com/WinPooh32/chips/misc
 
 go 1.26.2
 

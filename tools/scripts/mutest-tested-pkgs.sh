@@ -50,8 +50,8 @@ mutest_pkg() {
 
     (
         cd "$wt"
-        go tool -modfile=misc/go-mutesting-go.mod go-mutesting \
-            --exec=misc/scripts/mutate-test.sh \
+        go tool -modfile=tools/go-mutesting-go.mod go-mutesting \
+            --exec=tools/scripts/mutate-test.sh \
             --config "$ROOT_DIR/.mutesting.yml" "$pkg" 2>&1 | tee /dev/stderr
     ) >"$log" || true
 

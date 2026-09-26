@@ -40,7 +40,7 @@ if [ -n "$TEST_RECURSIVE" ]; then
 	TEST_RECURSIVE="/..."
 fi
 
-GOMUTESTING_TEST=$(go tool -modfile=misc/gotestsum-go.mod gotestsum --max-fails=1 -- -short -timeout $(printf '%ds' $MUTATE_TIMEOUT) -failfast $MUTATE_PACKAGE$TEST_RECURSIVE 2>&1)
+GOMUTESTING_TEST=$(go tool -modfile=tools/gotestsum-go.mod gotestsum --max-fails=1 -- -short -timeout $(printf '%ds' $MUTATE_TIMEOUT) -failfast $MUTATE_PACKAGE$TEST_RECURSIVE 2>&1)
 export GOMUTESTING_RESULT=$?
 
 if [ "$MUTATE_DEBUG" = true ] ; then

@@ -14,12 +14,12 @@ If a linter fires, fix the code or the config — never silence it.
 
 ## Linters Overview
 
-| Linter        | Target       | Config                  | Purpose                                  |
-| ------------- | ------------ | ----------------------- | ---------------------------------------- |
-| golangci-lint | `lint/go`    | `.golangci.yml`         | Go static analysis (90+ enabled linters) |
-| typos         | `lint/typos` | `.typos.toml`           | Spell-checking                           |
-| mdsmith       | `lint/md`    | `.mdsmith.yml`          | Markdown linting                         |
-| go-arch-lint  | `lint/arch`  | `misc/go-arch-lint.yml` | Architecture constraints                 |
+| Linter        | Target       | Config                   | Purpose                                  |
+| ------------- | ------------ | ------------------------ | ---------------------------------------- |
+| golangci-lint | `lint/go`    | `.golangci.yml`          | Go static analysis (90+ enabled linters) |
+| typos         | `lint/typos` | `.typos.toml`            | Spell-checking                           |
+| mdsmith       | `lint/md`    | `.mdsmith.yml`           | Markdown linting                         |
+| go-arch-lint  | `lint/arch`  | `tools/go-arch-lint.yml` | Architecture constraints                 |
 
 Run `make lint` to check all linters. Run `make fmt` to auto-fix formatting.
 
