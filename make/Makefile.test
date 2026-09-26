@@ -1,0 +1,37 @@
+## Run all tests
+.PHONY: test
+test: test/all
+
+.PHONY: test/unit
+test/unit:
+	@echo "Run unit tests"
+	@go tool -modfile=tools/gotestsum-go.mod gotestsum --format-hide-empty-pkg --format=pkgname-and-test-fails --format-icons=hivis -- -short -timeout=60s ./...
+
+.PHONY: test/all
+test/all:
+	@echo "Run all tests"
+	@go tool -modfile=tools/gotestsum-go.mod gotestsum --format-hide-empty-pkg --format=pkgname-and-test-fails --format-icons=hivis -- -timeout=60s ./...
+
+.PHONY: test/mutesting
+test/mutesting:
+	@echo "Run mutation testing"
+	@tools/scripts/mutest-tested-pkgs.sh
+	$(MAKE) test/mutest-clear
+
+.PHONY: test/mutest-pkg
+test/mutest-pkg:
+	@echo "Run mutation testing"
+	@go tool -modfile=tools/go-mutesting-go.mod go-mutesting --exec=tools/scripts/mutate-test.sh --config .mutesting.yml $(PACKAGE)
+	$(MAKE) test/mutest-clear
+
+.PHONY: test/mutest-clear
+test/mutest-clear:
+	@echo "Clean up..."
+	rm -rf /tmp/Test* /tmp/go-build* /tmp/go-mutesting* /tmp/net_C*
+
+## Coverage targets
+.PHONY: test/coverage
+test/coverage:
+	@echo "Run tests with coverage"
+	@go tool -modfile=tools/gotestsum-go.mod gotestsum --format-hide-empty-pkg --format=pkgname-and-test-fails --format-icons=hivis -- -timeout=60s -coverprofile=coverage.out ./...
+	@go tool cover -func=coverage.out | tail -n 1
