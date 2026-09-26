@@ -23,8 +23,6 @@ components:
 deps:
   main:
     mayDependOn:
-      - config
-      - application
       - commands
   commands:
     mayDependOn:
