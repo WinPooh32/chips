@@ -78,14 +78,16 @@ func Slug(title string) string {
 		return "issue"
 	}
 
-	if len(s) > maxSlugLen {
-		s = strings.TrimRight(s[:maxSlugLen], "-")
+	if r := []rune(s); len(r) > maxSlugLen {
+		s = strings.TrimRight(string(r[:maxSlugLen]), "-")
 	}
 
 	return s
 }
 
-// buildSlug kebab-cases the title, stripping control characters.
+// buildSlug kebab-cases the title, keeping unicode letters and digits and
+// stripping control characters. The resulting charset (letters, digits, '-')
+// is safe for Windows/NTFS file names.
 func buildSlug(title string) string {
 	var b strings.Builder
 
@@ -97,7 +99,7 @@ func buildSlug(title string) string {
 		}
 
 		switch {
-		case (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'):
+		case unicode.IsLetter(r) || unicode.IsDigit(r):
 			b.WriteRune(r)
 
 			prevDash = false

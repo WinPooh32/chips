@@ -49,6 +49,16 @@ func TestSlug(t *testing.T) {
 		{name: "cap trims trailing dash",
 			title: strings.Repeat("a", 59) + " " + strings.Repeat("b", 50),
 			want:  strings.Repeat("a", 59)},
+		{name: "cyrillic kept verbatim", title: "Починить логин", want: "починить-логин"},
+		{name: "cjk kept verbatim", title: "\u4fee\u590d \u767b\u5f55", want: "\u4fee\u590d-\u767b\u5f55"},
+		{name: "accented latin kept", title: "Café crème", want: "café-crème"},
+		{name: "mixed ascii and unicode", title: "Fix: логин (urgent)", want: "fix-логин-urgent"},
+		{name: "unicode digits kept", title: "١٢٣ test", want: "١٢٣-test"},
+		{name: "combining mark dropped", title: "e\u0301", want: "e"},
+		{name: "multibyte char straddles cap",
+			title: strings.Repeat("a", 59) + "éx",
+			want:  strings.Repeat("a", 59) + "é"},
+		{name: "ntfs forbidden chars only", title: `<>:/\\|?*"`, want: "issue"},
 	}
 	for _, tt := range tests {
 		tt := tt
