@@ -43,6 +43,10 @@ func TestSlug(t *testing.T) {
 		{name: "digits", title: "A1 B2", want: "a1-b2"},
 		{name: "no letters", title: "!!! ///", want: "issue"},
 		{name: "trailing separator", title: "Done -", want: "done"},
+		{name: "control chars stripped", title: "abc\x00def", want: "abcdef"},
+		{name: "newline and tab stripped", title: "hello\n\tworld", want: "helloworld"},
+		{name: "long title capped", title: strings.Repeat("a", 100), want: strings.Repeat("a", 60)},
+		{name: "cap trims trailing dash", title: strings.Repeat("a", 59) + " " + strings.Repeat("b", 50), want: strings.Repeat("a", 59)},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -297,4 +301,50 @@ func TestReadMissing(t *testing.T) {
 	s := newTestStore(t)
 
 	require.ErrorIs(t, s.Claim("zz99"), issues.ErrNotFound)
+}
+
+func TestParseMissingRequiredFields(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		omit string
+	}{
+		{name: "missing id", omit: "id"},
+		{name: "missing title", omit: "title"},
+		{name: "missing type", omit: "type"},
+		{name: "missing created-at", omit: "created-at"},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			root := t.TempDir()
+			s := issues.NewStore(root)
+
+			var lines []string
+			if tt.omit != "id" {
+				lines = append(lines, "id: zz11")
+			}
+			if tt.omit != "title" {
+				lines = append(lines, "title: Some title")
+			}
+			if tt.omit != "type" {
+				lines = append(lines, "type: task")
+			}
+			if tt.omit != "created-at" {
+				lines = append(lines, "created-at: 2026-01-01T00:00:00Z")
+			}
+
+			content := "---\n" + strings.Join(lines, "\n") + "\n---\nbody\n"
+			name := filepath.Join(root, "open", "zz11-some-title.md")
+			require.NoError(t, os.MkdirAll(filepath.Join(root, "open"), 0o700))
+			require.NoError(t, os.WriteFile(name, []byte(content), 0o600))
+
+			_, _, _, err := s.Read("zz11")
+			require.Error(t, err)
+			require.Contains(t, err.Error(), tt.omit)
+		})
+	}
 }

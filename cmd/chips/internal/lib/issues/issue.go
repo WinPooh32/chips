@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // Issue is a single tracked task.
@@ -52,6 +53,7 @@ const (
 	idAlphabet   = "abcdefghjkmnpqrstuvwxyz23456789"
 	idAttempts   = 10
 	minQuotedLen = 2
+	maxSlugLen   = 60
 )
 
 // Statuses lists every status directory in fixed order.
@@ -76,6 +78,10 @@ func Slug(title string) string {
 	prevDash := false
 
 	for _, r := range strings.ToLower(title) {
+		if unicode.IsControl(r) {
+			continue
+		}
+
 		switch {
 		case (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'):
 			b.WriteRune(r)
@@ -93,6 +99,10 @@ func Slug(title string) string {
 	s := strings.TrimRight(b.String(), "-")
 	if s == "" {
 		return "issue"
+	}
+
+	if len(s) > maxSlugLen {
+		s = strings.TrimRight(s[:maxSlugLen], "-")
 	}
 
 	return s
@@ -160,6 +170,32 @@ func parseFields(data []byte, iss *Issue) error {
 		if err := setField(iss, strings.TrimSpace(k), strings.TrimSpace(v)); err != nil {
 			return err
 		}
+	}
+
+	return requiredFields(iss)
+}
+
+// requiredFields reports the missing required frontmatter fields, if any.
+func requiredFields(iss *Issue) error {
+	var missing []string
+	if iss.ID == "" {
+		missing = append(missing, "id")
+	}
+
+	if iss.Title == "" {
+		missing = append(missing, "title")
+	}
+
+	if iss.Type == "" {
+		missing = append(missing, "type")
+	}
+
+	if iss.CreatedAt.IsZero() {
+		missing = append(missing, "created-at")
+	}
+
+	if len(missing) > 0 {
+		return fmt.Errorf("missing required frontmatter field(s): %s", strings.Join(missing, ", "))
 	}
 
 	return nil

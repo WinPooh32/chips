@@ -60,6 +60,25 @@ func TestCreateCommand(t *testing.T) {
 	require.Equal(t, id+"-fix-login-timeout.md", files[0].Name())
 }
 
+func TestCreateCommandMultilineDesc(t *testing.T) {
+	work := t.TempDir()
+	t.Setenv("CHIPS_ROOT", filepath.Join(work, ".chips"))
+
+	out, _ := runChips(t, "create", "Multiline desc", "--type", "task", "--desc", "line one\\nline two")
+	fields := strings.Fields(out)
+	require.NotEmpty(t, fields)
+	require.Equal(t, "created", fields[0])
+
+	files, err := os.ReadDir(filepath.Join(work, ".chips", "open"))
+	require.NoError(t, err)
+	require.Len(t, files, 1)
+
+	data, err := os.ReadFile(filepath.Join(work, ".chips", "open", files[0].Name()))
+	require.NoError(t, err)
+	require.Contains(t, string(data), "line one\nline two")
+	require.NotContains(t, string(data), "line one\\nline two")
+}
+
 func TestReadyCommand(t *testing.T) {
 	work := t.TempDir()
 	t.Setenv("CHIPS_ROOT", filepath.Join(work, ".chips"))

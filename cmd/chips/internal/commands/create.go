@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -19,10 +20,12 @@ func newCreateCmd() *cobra.Command {
 			return fmt.Errorf("read --type flag: %w", err)
 		}
 
-		desc, err := c.Flags().GetString("desc")
+		rawDesc, err := c.Flags().GetString("desc")
 		if err != nil {
 			return fmt.Errorf("read --desc flag: %w", err)
 		}
+
+		desc := strings.ReplaceAll(rawDesc, `\n`, "\n")
 
 		parent, err := c.Flags().GetString("parent")
 		if err != nil {
