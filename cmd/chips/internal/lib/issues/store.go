@@ -35,7 +35,9 @@ func NewStore(dir string) *Store {
 }
 
 // Create writes a new issue into open/ and returns it. An empty parent is
-// omitted from the frontmatter.
+// omitted from the frontmatter. When a parent is set the new issue becomes a
+// dependency of the parent: the parent is blocked until the issue closes.
+// A parent that is already done is an error.
 func (s *Store) Create(title, typ, desc, parent string) (*Issue, error) {
 	if !ValidType(typ) {
 		return nil, fmt.Errorf("invalid type %q", typ)
@@ -56,6 +58,21 @@ func (s *Store) Create(title, typ, desc, parent string) (*Issue, error) {
 	name := iss.ID + "-" + Slug(iss.Title) + ".md"
 	if err := s.writeFile(Open, name, render(iss, desc)); err != nil {
 		return nil, err
+	}
+
+	if parent != "" {
+		pst, _, err := s.locate(parent)
+		if err != nil {
+			return nil, fmt.Errorf("parent %s: %w", parent, err)
+		}
+
+		if pst == Done {
+			return nil, fmt.Errorf("parent %s is already done", parent)
+		}
+
+		if err := s.DepAdd(parent, iss.ID); err != nil {
+			return nil, err
+		}
 	}
 
 	return iss, nil

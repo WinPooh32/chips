@@ -97,9 +97,52 @@ func TestCreateWithParent(t *testing.T) {
 	iss, err := s.Create("Child task", issues.TypeTask, "desc", parent.ID)
 	require.NoError(t, err)
 
-	got, _, _, err := s.Read(iss.ID)
+	got, st, _, err := s.Read(iss.ID)
 	require.NoError(t, err)
 	require.Equal(t, parent.ID, got.Parent)
+	require.Equal(t, issues.Open, st)
+
+	// The parent is blocked by the new child.
+	p, pst, _, err := s.Read(parent.ID)
+	require.NoError(t, err)
+	require.Equal(t, issues.Blocked, pst)
+	require.Equal(t, []string{iss.ID}, p.BlockedBy)
+}
+
+func TestCreateWithParentUnblocksParent(t *testing.T) {
+	t.Parallel()
+
+	s := newTestStore(t)
+	parent := createIssue(t, s, "Ship the thing", issues.TypeEpic)
+	c1, err := s.Create("Child task", issues.TypeTask, "desc", parent.ID)
+	require.NoError(t, err)
+	c2, err := s.Create("Second child", issues.TypeTask, "desc", parent.ID)
+	require.NoError(t, err)
+
+	require.NoError(t, s.Close([]string{c1.ID}, "done"))
+
+	// One child still open: parent stays blocked.
+	_, st, _, err := s.Read(parent.ID)
+	require.NoError(t, err)
+	require.Equal(t, issues.Blocked, st)
+
+	require.NoError(t, s.Close([]string{c2.ID}, "done"))
+
+	// All children done: parent unblocks.
+	_, st, _, err = s.Read(parent.ID)
+	require.NoError(t, err)
+	require.Equal(t, issues.Open, st)
+}
+
+func TestCreateWithDoneParent(t *testing.T) {
+	t.Parallel()
+
+	s := newTestStore(t)
+	parent := createIssue(t, s, "Ship the thing", issues.TypeEpic)
+	require.NoError(t, s.Close([]string{parent.ID}, "done"))
+
+	_, err := s.Create("Child task", issues.TypeTask, "desc", parent.ID)
+	require.Error(t, err)
 }
 
 func TestCreateInvalidType(t *testing.T) {
