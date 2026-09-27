@@ -236,6 +236,13 @@ func TestReadyDanglingWarning(t *testing.T) {
 	require.Contains(t, errOut, "aa11")
 }
 
+func TestVersionFlag(t *testing.T) {
+	t.Parallel()
+
+	out, _ := runChips(t, "--version")
+	require.Equal(t, "chips version dev\n", out)
+}
+
 func TestErrorExit(t *testing.T) {
 	work := t.TempDir()
 	t.Setenv("CHIPS_ROOT", filepath.Join(work, ".chips"))

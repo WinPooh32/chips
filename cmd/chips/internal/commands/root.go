@@ -15,6 +15,11 @@ const (
 	readyState   = "ready"
 )
 
+// Version is stamped at release build time via -ldflags -X.
+//
+//nolint:gochecknoglobals // must be a package-level var for -ldflags -X stamping
+var Version = "dev"
+
 // storeDir returns the store root: $CHIPS_ROOT when set, else .chips.
 func storeDir() string {
 	if v := os.Getenv(storeRootEnv); v != "" {
@@ -29,6 +34,7 @@ func NewRoot() *cobra.Command {
 	cmd := new(cobra.Command)
 	cmd.Use = "chips"
 	cmd.Short = "chips is a local task tracker"
+	cmd.Version = Version
 	cmd.SilenceErrors = true
 	cmd.SilenceUsage = true
 	cmd.AddCommand(
