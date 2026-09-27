@@ -193,6 +193,26 @@ func TestCloseCommand(t *testing.T) {
 	require.Len(t, files, 2)
 }
 
+func TestCloseCommandMixedBatch(t *testing.T) {
+	work := t.TempDir()
+	t.Setenv("CHIPS_ROOT", filepath.Join(work, ".chips"))
+
+	a := createViaCLI(t, "Close valid", "task")
+	b := createViaCLI(t, "Close other", "task")
+
+	cmd := commands.NewRoot()
+	cmd.SetArgs([]string{"close", a, "zz99", b, "yy88", "--reason", "wrapped up"})
+
+	err := cmd.Execute()
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "zz99: issue not found")
+	require.Contains(t, err.Error(), "yy88: issue not found")
+
+	files, err := os.ReadDir(filepath.Join(work, ".chips", "done"))
+	require.NoError(t, err)
+	require.Len(t, files, 2)
+}
+
 func TestReadyDanglingWarning(t *testing.T) {
 	work := t.TempDir()
 	t.Setenv("CHIPS_ROOT", filepath.Join(work, ".chips"))

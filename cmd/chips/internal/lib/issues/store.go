@@ -11,6 +11,10 @@ import (
 )
 
 // Store reads and writes issues under a .chips root directory.
+//
+// Store is safe for concurrent use: it holds no mutable state beyond the
+// root path, each operation is independent, Save replaces files atomically
+// (temp file + rename), and Create retries on ID collisions.
 type Store struct {
 	root string
 }
@@ -18,6 +22,8 @@ type Store struct {
 const (
 	permDir  = 0o700
 	permFile = 0o600
+
+	uniqueIDAttempts = 1000
 )
 
 // ErrNotFound is returned when an issue id matches no file.
@@ -184,16 +190,35 @@ func (s *Store) Status(id string, to Status, note string) error {
 	return s.Move(id, st, to)
 }
 
-// Save rewrites the issue file in place, preserving its filename.
+// Save rewrites the issue file in place, preserving its filename. The
+// replacement is atomic: data is written to a temp file in the same
+// directory, then renamed over the target.
 func (s *Store) Save(iss *Issue, body string) error {
 	_, path, err := s.locate(iss.ID)
 	if err != nil {
 		return err
 	}
 
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".issue-*.tmp")
+	if err != nil {
+		return fmt.Errorf("create temp for %s: %w", path, err)
+	}
+
+	tmpName := tmp.Name()
+	defer os.Remove(tmpName)
+
 	data := render(iss, body)
-	if err := os.WriteFile(path, data, permFile); err != nil {
+	if _, err := tmp.Write(data); err != nil {
+		_ = tmp.Close()
 		return fmt.Errorf("write %s: %w", path, err)
+	}
+
+	if err := tmp.Close(); err != nil {
+		return fmt.Errorf("write %s: %w", path, err)
+	}
+
+	if err := os.Rename(tmpName, path); err != nil {
+		return fmt.Errorf("move %s: %w", path, err)
 	}
 
 	return nil
@@ -288,29 +313,22 @@ func (s *Store) DepRemove(id, dep string) error {
 }
 
 // Close moves each issue to done/, appending the reason, then unblocks any
-// blocked issue whose dependencies are all done.
+// blocked issue whose dependencies are all done. Every id is attempted and
+// all failures are reported together.
 func (s *Store) Close(ids []string, reason string) error {
 	ts := time.Now().UTC().Format(time.RFC3339)
 
+	var failed []error
+
 	for _, id := range ids {
-		iss, st, body, err := s.Read(id)
-		if err != nil {
-			return err
-		}
-
-		body = appendNote(body, fmt.Sprintf("## Closed: %s (%s)", reason, ts))
-		if err := s.Save(iss, body); err != nil {
-			return err
-		}
-
-		if err := s.Move(id, st, Done); err != nil {
-			return err
+		if err := s.closeOne(id, reason, ts); err != nil {
+			failed = append(failed, err)
 		}
 	}
 
 	blocked, err := s.List(Blocked)
 	if err != nil {
-		return err
+		return errors.Join(append(failed, err)...)
 	}
 
 	for _, iss := range blocked {
@@ -323,8 +341,31 @@ func (s *Store) Close(ids []string, reason string) error {
 		}
 
 		if err := s.Move(iss.ID, Blocked, Open); err != nil {
-			return err
+			return errors.Join(append(failed, err)...)
 		}
+	}
+
+	if len(failed) > 0 {
+		return errors.Join(failed...)
+	}
+
+	return nil
+}
+
+// closeOne closes a single issue, returning an error prefixed with the id.
+func (s *Store) closeOne(id, reason, ts string) error {
+	iss, st, body, err := s.Read(id)
+	if err != nil {
+		return fmt.Errorf("%s: %w", id, err)
+	}
+
+	body = appendNote(body, fmt.Sprintf("## Closed: %s (%s)", reason, ts))
+	if err := s.Save(iss, body); err != nil {
+		return fmt.Errorf("%s: %w", id, err)
+	}
+
+	if err := s.Move(id, st, Done); err != nil {
+		return fmt.Errorf("%s: %w", id, err)
 	}
 
 	return nil
@@ -377,7 +418,7 @@ func (s *Store) missingDep(iss *Issue) (string, error) {
 
 // uniqueID generates a collision-free issue id.
 func (s *Store) uniqueID() (string, error) {
-	for range idAttempts {
+	for range uniqueIDAttempts {
 		id, err := randomID()
 		if err != nil {
 			return "", err

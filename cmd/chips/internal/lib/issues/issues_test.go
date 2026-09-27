@@ -46,7 +46,9 @@ func TestSlug(t *testing.T) {
 		{name: "control chars stripped", title: "abc\x00def", want: "abcdef"},
 		{name: "newline and tab stripped", title: "hello\n\tworld", want: "helloworld"},
 		{name: "long title capped", title: strings.Repeat("a", 100), want: strings.Repeat("a", 60)},
-		{name: "cap trims trailing dash", title: strings.Repeat("a", 59) + " " + strings.Repeat("b", 50), want: strings.Repeat("a", 59)},
+		{name: "cap trims trailing dash",
+			title: strings.Repeat("a", 59) + " " + strings.Repeat("b", 50),
+			want:  strings.Repeat("a", 59)},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -327,12 +329,15 @@ func TestParseMissingRequiredFields(t *testing.T) {
 			if tt.omit != "id" {
 				lines = append(lines, "id: zz11")
 			}
+
 			if tt.omit != "title" {
 				lines = append(lines, "title: Some title")
 			}
+
 			if tt.omit != "type" {
 				lines = append(lines, "type: task")
 			}
+
 			if tt.omit != "created-at" {
 				lines = append(lines, "created-at: 2026-01-01T00:00:00Z")
 			}
@@ -346,5 +351,38 @@ func TestParseMissingRequiredFields(t *testing.T) {
 			require.Error(t, err)
 			require.Contains(t, err.Error(), tt.omit)
 		})
+	}
+}
+
+func TestSaveAtomicReplace(t *testing.T) {
+	t.Parallel()
+
+	root := t.TempDir()
+	s := issues.NewStore(root)
+	iss := createIssue(t, s, "Atomic save", issues.TypeTask)
+
+	require.NoError(t, s.Save(iss, "updated body"))
+
+	path := filepath.Join(root, "open", iss.ID+"-atomic-save.md")
+	data, err := os.ReadFile(path)
+	require.NoError(t, err)
+	require.Contains(t, string(data), "updated body")
+
+	entries, err := os.ReadDir(filepath.Join(root, "open"))
+	require.NoError(t, err)
+	require.Len(t, entries, 1)
+}
+
+func TestCreateNoDuplicateIDs(t *testing.T) {
+	t.Parallel()
+
+	s := newTestStore(t)
+
+	seen := make(map[string]bool)
+
+	for range 40 {
+		iss := createIssue(t, s, "Collision check", issues.TypeTask)
+		require.NotContains(t, seen, iss.ID)
+		seen[iss.ID] = true
 	}
 }

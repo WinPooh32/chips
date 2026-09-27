@@ -51,7 +51,6 @@ const (
 const (
 	idLen        = 4
 	idAlphabet   = "abcdefghjkmnpqrstuvwxyz23456789"
-	idAttempts   = 10
 	minQuotedLen = 2
 	maxSlugLen   = 60
 )
@@ -73,6 +72,21 @@ func ValidType(t string) bool {
 
 // Slug renders the kebab-case filename slug of a title.
 func Slug(title string) string {
+	s := buildSlug(title)
+
+	if s == "" {
+		return "issue"
+	}
+
+	if len(s) > maxSlugLen {
+		s = strings.TrimRight(s[:maxSlugLen], "-")
+	}
+
+	return s
+}
+
+// buildSlug kebab-cases the title, stripping control characters.
+func buildSlug(title string) string {
 	var b strings.Builder
 
 	prevDash := false
@@ -96,16 +110,7 @@ func Slug(title string) string {
 		}
 	}
 
-	s := strings.TrimRight(b.String(), "-")
-	if s == "" {
-		return "issue"
-	}
-
-	if len(s) > maxSlugLen {
-		s = strings.TrimRight(s[:maxSlugLen], "-")
-	}
-
-	return s
+	return strings.TrimRight(b.String(), "-")
 }
 
 // render serializes the issue as a markdown file with flat frontmatter.
